@@ -1,0 +1,14 @@
+services:
+  mysql-80:
+    image: mysql/mysql-server:8.0
+    container_name: mysql8
+    ports:
+      - "3308:3306"
+    command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql1234
+    volumes:
+      - ./conf.d:/etc/mysql/conf.d:ro
+      - ./logs:/var/log/mysql:rw
+      - ./initdb.d:/docker-entrypoint-initdb.d:ro
+
