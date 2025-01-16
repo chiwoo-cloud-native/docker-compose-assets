@@ -1,0 +1,109 @@
+---
+services:
+
+  mysql:
+    image: mysql/mysql-server:8.0
+    hostname: mysql
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql1234
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=mysql1234
+    volumes:
+      - ./mysql/mysql.cnf:/etc/mysql/conf.d
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql/data:/var/lib/mysql-files/data
+    networks:
+      - simplydemo
+    healthcheck: {test: mysql -p"mysql1234" -e 'select 1', interval: 10s, start_period: 120s}
+
+  broker:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: broker
+    hostname: broker
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    networks:
+      - simplydemo
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: echo srvr | nc zookeeper 2181 || exit 1
+      start_period: 20s
+      retries: 30
+      interval: 10s
+    networks:
+      - simplydemo
+    depends_on:
+      - broker
+
+  connect:
+    image: debezium/connect:2.7.3.Final
+    container_name: debezium-connect
+    ports:
+      - 8083:8083
+    healthcheck: {test: curl -f localhost:8083, interval: 3s, start_period: 120s}
+    environment:
+      - BOOTSTRAP_SERVERS=broker:29092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=connect_configs
+      - OFFSET_STORAGE_TOPIC=connect_offsets
+      - STATUS_STORAGE_TOPIC=connect_offsets
+      - CONNECT_PLUGIN_PATH=/kafka/connect
+      - CONNECT_REST_ADVERTISED_HOST_NAME=connect
+      - CONNECT_REST_PORT=8083
+    restart: always
+# for adding local kafka plugins
+#    volumes:
+#      - ./plugins:/kafka/connect
+    networks:
+      - simplydemo
+    depends_on:
+      mysql: {condition: service_healthy}
+      broker: {condition: service_healthy}
+
+  debezium-ui:
+    image: debezium/debezium-ui:2.1.2.Final
+    container_name: debezium-ui
+    ports:
+      - "8090:8080"
+    environment:
+      - KAFKA_CONNECT_URIS=http://connect:8083
+    depends_on:
+      - connect
+    networks:
+      - simplydemo
+
+networks:
+  simplydemo:
+    name: simplydemo

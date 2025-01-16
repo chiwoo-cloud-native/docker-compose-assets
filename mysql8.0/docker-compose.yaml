@@ -1,3 +1,4 @@
+---
 services:
   mysql-80:
     image: mysql/mysql-server:8.0
