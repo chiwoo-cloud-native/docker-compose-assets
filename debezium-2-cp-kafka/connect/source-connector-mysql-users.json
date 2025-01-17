@@ -1,0 +1,28 @@
+{
+  "name": "source-connector-mysql-users",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+    "tasks.max": "1",
+    "database.hostname": "mysql",
+    "database.server.id": "760501120",
+    "database.server.name": "simply-server-01",
+    "database.port": "3306",
+    "database.user": "simplydemo",
+    "database.password": "simplydemo1234",
+    "database.allowPublicKeyRetrieval": true,
+    "topic.prefix": "debezium",
+    "table.include.list": "simplydemo.users",
+    "database.include.list": "simplydemo",
+    "database.history.kafka.topic": "history.database-changes",
+    "database.history.kafka.bootstrap.servers": "broker:29092",
+    "schema.history.internal.kafka.topic": "history.schema-changes",
+    "schema.history.internal.kafka.bootstrap.servers": "broker:29092",
+    "time.precision.mode": "connect",
+    "heartbeat.interval.ms": "2000",
+    "snapshot.locking.mode": "none",
+    "skipped.operations": "none",
+    "quote.identifiers": "always",
+    "decimal.handling.mode": "double"
+  }
+}
+

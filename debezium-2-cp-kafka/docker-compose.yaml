@@ -42,7 +42,7 @@ services:
     healthcheck:
       test: nc -z localhost 9092 || exit -1
       start_period: 15s
-      interval: 5s
+      interval: 20s
       timeout: 10s
       retries: 10
     networks:
@@ -72,7 +72,7 @@ services:
     container_name: debezium-connect
     ports:
       - 8083:8083
-    healthcheck: {test: curl -f localhost:8083, interval: 3s, start_period: 120s}
+    healthcheck: {test: curl -f localhost:8083, interval: 20s, start_period: 120s}
     environment:
       - BOOTSTRAP_SERVERS=broker:29092
       - GROUP_ID=1
