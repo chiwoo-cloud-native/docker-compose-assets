@@ -3,9 +3,21 @@
 Kafka Zookeeper 환경에서 Debezium CDC를 통해 From 테이블에서 To 테이블로 테이터스트림을 통해 프로비저닝하는 샘플 프로젝트 입니다.
 
 ## Run
+
+작업 경로가 `debezium-2-cp-kafka` 인지 확인 합니다. 
+
 ```
 cd debezium-2-cp-kafka
+```
 
+- start.sh
+```
+# docker compose 를 구동 합니다.
+sh start.sh 
+```
+
+- manually starting
+```
 # run
 docker-compose up -d
 
