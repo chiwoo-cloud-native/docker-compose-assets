@@ -42,7 +42,7 @@ curl -s http://localhost:8083
 
 ### Debezium Source/Sink 커넥터 추가
 
-`debezium-source-connector-mysql-users` 소스 커넥터를 추가 합니다. 
+Debezium Source 및 Sink 커넥터를 순서대로 추가합니다.  
 
 ```
 # Source Users
@@ -59,6 +59,12 @@ curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/js
 curl -X DELETE http://localhost:8083/connectors/source-connector-mysql-users
 curl -X DELETE http://localhost:8083/connectors/sink-connector-mysql-customer
 curl -X DELETE http://localhost:8083/connectors/sink-connector-mysql-board
+```
+
+- 로그를 통해 커넥터 동작을 상세하게 확인할 수 있습니다.
+
+```
+docker exec -it debezium-connect tail -f logs/connect-service.log
 ```
 
 - [io.debezium.connector.mysql.MySqlConnector](https://debezium.io/documentation/reference/stable/connectors/mysql.html)

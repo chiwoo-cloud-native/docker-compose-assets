@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS demo.board
     twitter             VARCHAR(255),
     viewcnt             INT DEFAULT 0,
     user_type           VARCHAR(10),
+    id                  BIGINT NULL,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
