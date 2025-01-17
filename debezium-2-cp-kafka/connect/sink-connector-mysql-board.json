@@ -1,0 +1,31 @@
+{
+  "name": "sink-connector-mysql-board",
+  "config": {
+    "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+    "topics": "debezium.simplydemo.users",
+    "connection.url": "jdbc:mysql://mysql:3306/demo",
+    "connection.username": "demo",
+    "connection.password": "demo1234",
+    "table.name.format": "board",
+    "quote.identifiers": true,
+    "auto.create": false,
+    "auto.evolve": false,
+    "delete.enabled": true,
+    "pk.mode": "none",
+    "table.types": "TABLE",
+    "transforms": "unwrap,renameField,filterFields,staticField",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+    "transforms.renameField.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.renameField.renames": "id:user_id",
+    "transforms.filterFields.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.filterFields.blacklist": "id,residence,lat,lon",
+    "transforms.filterFields.replace.null.with.default": true,
+    "transforms.staticField.type": "org.apache.kafka.connect.transforms.InsertField$Value",
+    "transforms.staticField.static.field": "user_type",
+    "transforms.staticField.static.value": "HERO",
+    "key.converter.schemas.enable": false,
+    "value.converter.schemas.enable": false
+  }
+}

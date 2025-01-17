@@ -1,6 +1,6 @@
 # debezium-2-cp-kafka
 
-Kafka Zookeeper 기반의 Debezium CDC 를 처리하는 샘플 입니다. 
+Kafka Zookeeper 환경에서 Debezium CDC를 통해 From 테이블에서 To 테이블로 테이터스트림을 통해 프로비저닝하는 샘플 프로젝트 입니다.
 
 ## Run
 ```
@@ -11,6 +11,9 @@ docker-compose up -d
 
 # stop
 docker-compose stop
+
+# down
+docker-compose down --volumes
 ```
 
 ### mysql
@@ -19,11 +22,10 @@ docker-compose stop
 # Terminal
 docker exec -it mysql /bin/bash
 
-# IN-Terminal
+# in-terminal
 mysql> mysql -p"mysql1234" -D simplydemo
-mysql> mysql -u simplydemo -p"simplydemo1234" -D simplydemo
-mysql> show tables;
-mysql> select * from customer;
+mysql> show databases;
+mysql> select * from simplydemo.users;
 ```
 
 ## Debezium
@@ -38,19 +40,33 @@ curl -s http://localhost:8083
 [Debezium UI](http://localhost:8090) 대시보드를 통해 커넥트를 확인 가능합니다. 
 
 
-### Debezium mysql-source 커넥터 추가
+### Debezium Source/Sink 커넥터 추가
 
 `debezium-source-connector-mysql-users` 소스 커넥터를 추가 합니다. 
 
 ```
-# source 커넥터 추가
-curl -X POST 'http://localhost:8083/connectors' \
--H 'Content-Type: application/json' \
--d @connect/debezium-source-connector-mysql-users.json
+# Source Users
+curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @connect/source-connector-mysql-users.json
 
-# source 커넥터 삭제 
-curl -X DELETE http://localhost:8083/connectors/debezium-source-connector-mysql-users
+# Sink Customer
+curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @connect/sink-connector-mysql-customer.json
+
+# Sink Board
+curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @connect/sink-connector-mysql-board.json
+
+
+# 커넥터 삭제 참고 
+curl -X DELETE http://localhost:8083/connectors/source-connector-mysql-users
+curl -X DELETE http://localhost:8083/connectors/sink-connector-mysql-customer
+curl -X DELETE http://localhost:8083/connectors/sink-connector-mysql-board
 ```
+
+- [io.debezium.connector.mysql.MySqlConnector](https://debezium.io/documentation/reference/stable/connectors/mysql.html)
+- [io.debezium.connector.jdbc.JdbcSinkConnector](https://debezium.io/documentation/reference/stable/connectors/jdbc.html)
+
+## 커텍터를 통한 메시징 테스트
+
+users 테이블 Source 에서 marketing 테이블 Target 으로 적재하는 기능을 확인합니다. 
 
 ### mysql의 users 테이블에 샘플 데이터 적재 
 
@@ -59,36 +75,43 @@ docker exec -it mysql /bin/bash
 
 mysql -usimplydemo -psimplydemo1234 -Dsimplydemo
 
-INSERT INTO users (first_name, last_name, email, residence, lat, lon)
-VALUES ('seonbo3', 'shim', 'seonbo.shim@gmail.com', 'Secho, Seoul City', 33.019, 44.624);
+INSERT INTO users (first_name, last_name, email, residence, lat, lon) VALUES ('seonbo', 'shim', 'seonbo.shim@gmail.com', 'Secho, Seoul City', 33.019, 44.624);
+
+
+select * from users;
+select * from demo.customer;
+select * from demo.board;
 ```
 
 ### kafka 토픽의 데이터 확인
 
-- Kafa 토픽 리스트 조회 
-
-```
-docker exec -it broker \
-  kafka-topics --bootstrap-server broker:29092 --list
-```
 
 - Kafa 토픽 메시지 Consume 확인  
 
 ```
+# Kafa 토픽 리스트 조회 
+docker exec -it broker kafka-topics --bootstrap-server broker:9092 --list
+
 # 신규 메시지만 소비 
-docker exec -it broker \
-  kafka-console-consumer --bootstrap-server broker:29092 \
-  --topic debezium.simplydemo.users --from-beginning
+docker exec -it broker kafka-console-consumer --bootstrap-server broker:9092 --topic debezium.simplydemo.users
   
-# 전체 메시지 모두를 소비  
-docker exec -it broker \
-  kafka-console-consumer --bootstrap-server broker:29092 \
-  --topic debezium.simplydemo.users \
-  --from-beginning  
+# 메시지 모두 소비  
+docker exec -it broker kafka-console-consumer --bootstrap-server broker:9092 --topic debezium.simplydemo.users --from-beginning  
 ```
 
 
 ## Appendix
+
+### Topic 제거 및 생성
+
+```
+docker exec -it broker /bin/bash
+
+kafka-topics --bootstrap-server broker:9092 --list
+kafka-topics --delete --topic debezium.simplydemo.users --bootstrap-server broker:9092
+kafka-topics --create --topic debezium.simplydemo.users --bootstrap-server broker:9092 --partitions 3 --replication-factor 1
+kafka-console-consumer --topic debezium.simplydemo.users --bootstrap-server broker:9092 --from-beginning --property print.key=true
+```
 
 ### 로컬 플러그인 추가 방법
 별도 kafka 플러그인을 설치하려면 plugins 폴더를 만들고 아래와 같이 라이브러리를 추가하면 됩니다.
@@ -109,47 +132,9 @@ docker exec -it debezium-connect /bin/bash
 ls -al /kafka/connect
 ```
 
-- [debezium-ui](http://localhost:8090/) UI 화면 확인 
+### real-time-analytics-book
 
+- [real-time-analytics-book](https://github.com/mneedham/real-time-analytics-book.git)
+- [Change_Data_Capture_Streaming](https://github.com/nits302/Change_Data_Capture_Streaming)
+- [cdc-debezium-kafka](https://github.com/zanty2908/cdc-debezium-kafka.git)
 
-
-
-## Down
-
-```
-docker-compose down
-```
-
-
-## Example
-
-```
-version: '3'
-services:
-  mysql-80:
-    image: mysql/mysql-server:8.0
-    volumes:
-      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
-    ports:
-      - "3308:3306"
-    command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
-    environment:
-      - MYSQL_ROOT_PASSWORD="Mysql123$"
-  my-app:
-    image: your/myapp
-    env_file:
-      - myapp.env
-    environment:
-      - DBHOST=mysql-80
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mysql-80
-```
-
-- [myapp.env]
-```
-DBNAME=simplydemo
-DBUSER=simplydemo
-DBPASS=Simplydemo123$
-```
