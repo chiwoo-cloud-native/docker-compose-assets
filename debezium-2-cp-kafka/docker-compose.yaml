@@ -17,7 +17,7 @@ services:
       - ./mysql/data:/var/lib/mysql-files/data
     networks:
       - simplydemo
-    healthcheck: {test: mysql -p"mysql1234" -e 'select 1', interval: 10s, start_period: 120s}
+    healthcheck: { test: mysql -p"mysql1234" -e 'select 1', interval: 10s, start_period: 120s }
 
   broker:
     image: confluentinc/cp-kafka:7.4.0
@@ -72,7 +72,7 @@ services:
     container_name: debezium-connect
     ports:
       - 8083:8083
-    healthcheck: {test: curl -f localhost:8083, interval: 20s, start_period: 120s}
+    healthcheck: { test: curl -f localhost:8083, interval: 20s, start_period: 120s }
     environment:
       - BOOTSTRAP_SERVERS=broker:29092
       - GROUP_ID=1
@@ -83,14 +83,14 @@ services:
       - CONNECT_REST_ADVERTISED_HOST_NAME=connect
       - CONNECT_REST_PORT=8083
     restart: always
-# for adding local kafka plugins
-#    volumes:
-#      - ./plugins:/kafka/connect
+    # for adding local kafka plugins
+    volumes:
+      - ./connect/plugins:/kafka/connect/debezium-connector-simplydemo:ro
     networks:
       - simplydemo
     depends_on:
-      mysql: {condition: service_healthy}
-      broker: {condition: service_healthy}
+      mysql: { condition: service_healthy }
+      broker: { condition: service_healthy }
 
   debezium-ui:
     image: debezium/debezium-ui:2.1.2.Final

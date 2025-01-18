@@ -93,12 +93,20 @@ docker exec -it mysql /bin/bash
 
 mysql -usimplydemo -psimplydemo1234 -Dsimplydemo
 
-INSERT INTO users (first_name, last_name, email, residence, lat, lon) VALUES ('seonbo', 'shim', 'seonbo.shim@gmail.com', 'Secho, Seoul City', 33.019, 44.624);
-
-
 select * from users;
 select * from demo.customer;
 select * from demo.board;
+
+
+insert into users (id, first_name, last_name, email, residence, lat, lon) values (11, 'seonbo', 'shim', 'seonbo.shim@gmail.com', 'Secho, Seoul City', 33.019, 44.624);
+
+delete 
+from    users 
+where   id = 4;
+
+update  users 
+set     email = 'baraltaran@gmail.com'
+where   id = 3;
 ```
 
 ### kafka 토픽의 데이터 확인
@@ -150,8 +158,10 @@ docker exec -it debezium-connect /bin/bash
 ls -al /kafka/connect
 ```
 
-### real-time-analytics-book
+### References
 
+- [debezium](https://debezium.io/)
+- [FullName Custom Transform](https://github.com/simplydemo/simplydemo-kafka-fullname-transform)
 - [real-time-analytics-book](https://github.com/mneedham/real-time-analytics-book.git)
 - [Change_Data_Capture_Streaming](https://github.com/nits302/Change_Data_Capture_Streaming)
 - [cdc-debezium-kafka](https://github.com/zanty2908/cdc-debezium-kafka.git)
