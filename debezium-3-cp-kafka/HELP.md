@@ -126,6 +126,7 @@ users 테이블 Source 에서 marketing 테이블 Target 으로 적재하는 기
 docker exec -it mysql /bin/bash
 
 mysql -usimplydemo -psimplydemo1234 -Dsimplydemo
+mysql -udemo -pdemo1234 -Ddemo
 
 select * from users;
 select * from demo.customer;
@@ -140,7 +141,11 @@ update  users set email = 'baraltaran@gmail.com' where id = 3;
 select * from common_code;
 select * from demo.codes;
 
-insert into common_code (group_code,code,code_name,description) values ('DELETE','REMOVE','Removed','Removed status');
+insert into common_code (group_code,code,code_name,description) values ('STATUS','REMOVE','Removed','Removed status');
+
+delete from common_code where id = 3;
+
+update common_code set code = 'REMOVE-01' where id = 7;
 ```
 
 ### kafka 토픽의 데이터 확인

@@ -161,7 +161,7 @@ services:
     container_name: debezium-connect
     ports:
       - 8083:8083
-    healthcheck: { test: curl -f localhost:8083, interval: 20s, start_period: 120s }
+    healthcheck: { test: curl -f localhost:8083, interval: 20s, start_period: 60s }
     environment:
       - GROUP_ID=1
       - BOOTSTRAP_SERVERS=kafka1:29092,kafka2:29092,kafka3:29092

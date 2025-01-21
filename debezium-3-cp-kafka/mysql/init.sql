@@ -8,13 +8,13 @@ GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *
 FLUSH PRIVILEGES;
 
 CREATE TABLE IF NOT EXISTS simplydemo.common_code (
-    ID                  INT AUTO_INCREMENT PRIMARY KEY,
-    GROUP_CODE          VARCHAR(50) NOT NULL COMMENT '코드 그룹',
-    CODE                VARCHAR(50) NOT NULL COMMENT '개별 코드',
-    CODE_NAME           VARCHAR(100) NOT NULL COMMENT '코드 이름',
-    DESCRIPTION         VARCHAR(255) DEFAULT NULL COMMENT '설명',
-    CREATED_AT          TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성 일시',
-    UPDATED_AT          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
+    ID                  INT             AUTO_INCREMENT PRIMARY KEY,
+    GROUP_CODE          VARCHAR(50)     NOT NULL,
+    CODE                VARCHAR(50)     NOT NULL,
+    CODE_NAME           VARCHAR(100)    NOT NULL,
+    DESCRIPTION         VARCHAR(255)    DEFAULT NULL,
+    CREATED_AT          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    UPDATED_AT          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY          unique_group_code (GROUP_CODE, CODE)
 ) COMMENT='공통 코드 테이블';
 
@@ -101,12 +101,13 @@ CREATE TABLE IF NOT EXISTS demo.board
 );
 
 CREATE TABLE IF NOT EXISTS demo.codes (
-    id                  INT AUTO_INCREMENT PRIMARY KEY,
-    code_group          VARCHAR(50) NOT NULL COMMENT '코드 그룹',
-    code                VARCHAR(50) NOT NULL COMMENT '개별 코드',
-    code_name           VARCHAR(100) NOT NULL COMMENT '코드 이름',
-    description         VARCHAR(255) DEFAULT NULL COMMENT '설명',
-    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성 일시',
-    updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
+    id                  INT             AUTO_INCREMENT PRIMARY KEY,
+    code_group          VARCHAR(50)     NOT NULL DEFAULT 'ROOT',
+    code                VARCHAR(50)     NOT NULL,
+    code_name           VARCHAR(100)    NOT NULL,
+    description         VARCHAR(255)    NULL,
+    created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY          unique_group_code (code_group, code)
-) COMMENT='공통 코드 테이블';
+);
+
