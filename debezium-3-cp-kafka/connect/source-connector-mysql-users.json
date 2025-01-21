@@ -11,7 +11,7 @@
     "database.password": "simplydemo1234",
     "database.allowPublicKeyRetrieval": true,
     "topic.prefix": "debezium",
-    "table.include.list": "simplydemo.users",
+    "table.include.list": "simplydemo.users,simplydemo.common_code",
     "database.include.list": "simplydemo",
     "database.history.kafka.topic": "history.database-changes",
     "database.history.kafka.bootstrap.servers": "kafka1:29092,kafka2:29092,kafka3:29092",

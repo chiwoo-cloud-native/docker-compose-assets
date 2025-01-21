@@ -1,0 +1,26 @@
+{
+  "name": "sink-connector-mysql-codes",
+  "config": {
+    "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+    "topics": "debezium.simplydemo.common_code",
+    "connection.url": "jdbc:mysql://mysql:3306/demo",
+    "connection.username": "demo",
+    "connection.password": "demo1234",
+    "table.name.format": "codes",
+    "insert.mode": "upsert",
+    "delete.enabled": false,
+    "auto.create": false,
+    "auto.evolve": false,
+    "schema.evolution": "basic",
+    "primary.key.fields": "id",
+    "primary.key.mode": "record_value",
+    "transforms": "unwrap,renameFields",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": false,
+    "transforms.renameFields.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.renameFields.renames": "ID:id,GROUP_CODE:code_group,CODE:code,CODE_NAME:code_name,DESCRIPTION:description",
+    "transforms.renameFields.blacklist": "CREATED_AT,UPDATED_AT"
+  }
+}
+

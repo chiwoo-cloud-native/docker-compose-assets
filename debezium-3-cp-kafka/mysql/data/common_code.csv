@@ -1,0 +1,7 @@
+group_code,code,code_name,description
+USER_ROLE,ADMIN,Administrator,System Administrator's Role
+USER_ROLE,USER,User,User Role
+USER_ROLE,GUEST,Guest,Guest Role
+STATUS,ACTIVE,Enabled,Enabled status
+STATUS,INACTIVE,Disabled,Disabled status
+STATUS,PENDING,Suspended,Suspended status for approval

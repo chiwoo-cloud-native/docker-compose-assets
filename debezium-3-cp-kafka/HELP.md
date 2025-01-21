@@ -95,11 +95,16 @@ curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/js
 # Sink Board
 curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @connect/sink-connector-mysql-board.json
 
+# Sink Codes
+curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @connect/sink-connector-mysql-codes.json
+
 
 # 커넥터 삭제 참고 
 curl -X DELETE http://localhost:8083/connectors/source-connector-mysql-users
 curl -X DELETE http://localhost:8083/connectors/sink-connector-mysql-customer
 curl -X DELETE http://localhost:8083/connectors/sink-connector-mysql-board
+curl -X DELETE http://localhost:8083/connectors/sink-connector-mysql-codes
+
 ```
 
 - 로그를 통해 커넥터 동작을 상세하게 확인할 수 있습니다.
@@ -126,12 +131,16 @@ select * from users;
 select * from demo.customer;
 select * from demo.board;
 
-
 insert into users (id, first_name, last_name, email, residence, lat, lon) values (11, 'seonbo', 'shim', 'seonbo.shim@gmail.com', 'Secho, Seoul City', 33.019, 44.624);
 
 delete from users where id = 4;
 
 update  users set email = 'baraltaran@gmail.com' where id = 3;
+
+select * from common_code;
+select * from demo.codes;
+
+insert into common_code (group_code,code,code_name,description) values ('DELETE','REMOVE','Removed','Removed status');
 ```
 
 ### kafka 토픽의 데이터 확인
@@ -148,6 +157,8 @@ docker exec -it kafka1 kafka-console-consumer --bootstrap-server kafka1:29092 --
   
 # 메시지 모두 소비  
 docker exec -it kafka1 kafka-console-consumer --bootstrap-server kafka1:29092 --topic debezium.simplydemo.users --from-beginning  
+
+docker exec -it kafka1 kafka-console-consumer --bootstrap-server kafka1:29092 --topic debezium.simplydemo.common_code --from-beginning  
 ```
 
 
