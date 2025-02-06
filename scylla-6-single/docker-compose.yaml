@@ -1,0 +1,25 @@
+---
+services:
+
+  scylla:
+    image: scylladb/scylla:6.2
+    container_name: scylla
+    restart: always
+    command: >
+      --seeds=scylla
+      --smp 1
+      --memory 2G
+      --api-address 0.0.0.0
+    ports:
+      - "9042:9042"
+    volumes:
+      - ./scylla/scylla.yaml:/etc/scylla/scylla.yaml
+      - ./scylla/cassandra-rackdc.properties:/etc/scylla/cassandra-rackdc.properties
+      - ./scylla/mutant-data.txt:/tmp/mutant-data.txt
+    networks:
+      simplydemo:
+
+networks:
+  simplydemo:
+    name: simplydemo
+    driver: bridge
