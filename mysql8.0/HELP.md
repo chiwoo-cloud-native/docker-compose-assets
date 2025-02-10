@@ -12,10 +12,18 @@ docker-compose up -d
 docker exec -it mysql8 /bin/bash
 
 # IN-Terminal
-mysql> mysql -u simplydemo -p"simplydemo1234" -D simplydemo
+mysql -u simplydemo -p"simplydemo1234" -D simplydemo
+
 mysql> show tables;
 mysql> select * from customer;
 
+mysql -u kafkasrc -p"DeMoKafkaSrc1234%%" -D demosrc
+mysql> show tables;
+mysql> select * from demosrc.products;
+
+mysql -u kafkasink -p"DeMoKafkaSinker1234%%" -D demosink
+mysql> show tables;
+mysql> select * from demosink.productinfo;
 
 # stop
 docker-compose down

@@ -12,4 +12,3 @@ services:
       - ./conf.d:/etc/mysql/conf.d:ro
       - ./logs:/var/log/mysql:rw
       - ./initdb.d:/docker-entrypoint-initdb.d:ro
-
