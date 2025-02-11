@@ -1,0 +1,71 @@
+---
+services:
+
+  mysqlsvc:
+    image: mysql/mysql-server:8.0
+    container_name: mysqlsvc
+    hostname: mysqlsvc
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root1234
+      - MYSQL_USER=simplydemo
+      - MYSQL_PASSWORD=demo1234
+    healthcheck: { test: mysql -proot1234 -e 'select 1', interval: 5s, start_period: 100s }
+    volumes:
+      - ./mysql/mysql.cnf:/etc/mysql/conf.d
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - simplydemo
+#    networks:
+#      simplydemo:
+#        ipv4_address: 172.19.10.10
+
+  connect:
+    image: debezium/connect:2.7.3.Final
+    container_name: connect
+    ports:
+      - 8083:8083
+    healthcheck: { test: curl -f localhost:8083, interval: 20s, start_period: 100s }
+    environment:
+      # Kafka Connect 기본 설정
+      - CONNECT_PLUGIN_PATH=/kafka/connect
+      - BOOTSTRAP_SERVERS=b-2.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098,b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098
+      - GROUP_ID=myConnector
+      - CONFIG_STORAGE_TOPIC=connect-configs
+      - OFFSET_STORAGE_TOPIC=connect-offsets
+      - STATUS_STORAGE_TOPIC=connect-status
+      - KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - OFFSET_FLUSH_INTERVAL_MS=60000
+      - CONNECT_REST_ADVERTISED_HOST_NAME=connect
+      - CONNECT_REST_PORT=8083
+      # IAM 인증 설정
+      - AWS_PROFILE=${AWS_PROFILE:-stg-stg}
+      - AWS_SHARED_CREDENTIALS_FILE=/kafka/.aws/credentials
+      - AWS_REGION=ap-northeast-2
+      - CONNECT_SECURITY_PROTOCOL=SASL_SSL
+      - CONNECT_SASL_MECHANISM=AWS_MSK_IAM
+      - CONNECT_SASL_JAAS_CONFIG=software.amazon.msk.auth.iam.IAMLoginModule required;
+      - CONNECT_SASL_CLIENT_CALLBACK_HANDLER_CLASS=software.amazon.msk.auth.iam.IAMClientCallbackHandler
+      # 플러그인 경로
+      - CONNECT_PLUGIN_PATH=/kafka/connect/debezium-plugins
+      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/*:/kafka/connect/aws-msk-iam-auth/aws-msk-iam-auth-2.2.0.jar
+    volumes:
+      - ~/.aws:/kafka/.aws:ro
+      - ./connect/plugins:/kafka/connect/debezium-plugins:ro
+      - ./connect/iam:/kafka/connect/aws-msk-iam-auth:ro
+    networks:
+      - simplydemo
+    depends_on:
+      mysqlsvc: { condition: service_healthy }
+
+networks:
+  simplydemo:
+    name: simplydemo
+
+#networks:
+#  simplydemo:
+#    ipam:
+#      config:
+#        - subnet: 172.19.0.0/16

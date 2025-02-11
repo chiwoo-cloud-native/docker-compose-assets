@@ -1,0 +1,82 @@
+# debezium-2-msk
+
+
+```
+
+docker compose down connect
+docker compose up connect -d
+
+
+docker exec -it mysql /bin/bash
+
+mysql -h localhost -u kafkasrc -p'kafkasrc1234%' -D demosrc 
+mysql -h kafka -u kafkasrc -p'kafkasrc1234%' -D demosrc 
+
+mysql -h mysqlsvc -u kafkasrc -pkafkasrc1234% -D demosrc
+
+mysql -h localhost -u mysql -p'root1234' -Dmysql 
+
+kafka-topics.sh --create --bootstrap-server BOOTSTRAP_SERVER_STRING --replication-factor 1 --partitions 1 --topic TOPIC_NAME
+
+
+
+
+
+curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @source-connector-demosrc.json
+
+curl -X DELETE http://localhost:8083/connectors/source-connector-demosrc
+
+```
+
+## Run
+```
+# run
+docker-compose up -d
+
+
+# MySQL
+docker exec -it mysqlsvc /bin/bash
+mysql -u kafkasrc -pkafkasrc1234% -D demosrc
+ 
+
+# stop
+docker-compose down
+```
+
+
+### connector 재 시작
+```
+docker compose down connect
+docker compose up connect -d
+```
+
+## kafka CLI
+
+
+### Topic 관리
+
+
+
+```
+export CLASSPATH=$(find /Users/seonbo.shim/opt/kafka_2.13-3.6.2/libsext -name "*.jar" | tr "\n" ":")$CLASSPATH
+export BOOTSTRAP_SERVER="b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098,b-2.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098"
+
+# Topic 생성
+kafka-topics.sh --create --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SERVER --replication-factor 2 --partitions 1 --command-config client.properties
+
+# Topic 삭제
+kafka-topics.sh --delete --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties  
+
+# Topic 목록 조회 
+kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+```
+
+
+### Topic 데이터 확인
+
+```
+kafka-console-consumer --topic debezium.simplydemo.users --bootstrap-server broker:9092 --from-beginning --property print.key=true
+```
+
+ 
+
