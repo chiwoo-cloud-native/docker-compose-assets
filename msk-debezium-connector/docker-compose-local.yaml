@@ -17,12 +17,9 @@ services:
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - simplydemo
-#    networks:
-#      simplydemo:
-#        ipv4_address: 172.19.10.10
 
   connect:
-    image: debezium/connect:2.7.3.Final
+    image: quay.io/debezium/connect:3.0.7.Final
     container_name: connect
     ports:
       - 8083:8083
@@ -50,7 +47,7 @@ services:
       - CONNECT_SASL_CLIENT_CALLBACK_HANDLER_CLASS=software.amazon.msk.auth.iam.IAMClientCallbackHandler
       # 플러그인 경로
       - CONNECT_PLUGIN_PATH=/kafka/connect/debezium-plugins
-      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/debezium-connector-mysql/*:/kafka/connect/*
+      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/debezium-connector-mysql/*
     command: >
       bash -c "
         echo 'security.protocol=SASL_SSL' > /kafka/bin/client.properties &&
@@ -61,17 +58,11 @@ services:
     volumes:
       - ~/.aws:/kafka/.aws:ro
       - ./connect/plugins:/kafka/connect/debezium-plugins:ro
-    networks:
-      - simplydemo
     depends_on:
       mysqlsvc: { condition: service_healthy }
+    networks:
+      - simplydemo
 
 networks:
   simplydemo:
     name: simplydemo
-
-#networks:
-#  simplydemo:
-#    ipam:
-#      config:
-#        - subnet: 172.19.0.0/16
