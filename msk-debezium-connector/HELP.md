@@ -50,7 +50,7 @@ docker compose up connect -d
 ```
 
 
-### 커넥터 추가
+### Source 커넥터 추가
 ```
 # 추가 
 curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @connect/source-connector-demosrc.json
@@ -63,6 +63,23 @@ curl http://localhost:8083/connectors/source-connector-demosrc/status
 
 # 제거
 curl -X DELETE http://localhost:8083/connectors/source-connector-demosrc
+
+```
+
+### Sink 커넥터 추가
+```
+# 추가 
+curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @connect/sink-connector-productinfo.json
+
+# 상태 확인 
+curl http://localhost:8083/connectors/sink-connector-productinfo/status
+
+# 제거
+curl -X DELETE http://localhost:8083/connectors/sink-connector-productinfo
+
+# 로그레밸 조정 
+curl -X PUT http://localhost:8083/connectors/loggers/org.apache.kafka.connect -H "Content-Type:application/json" -d '{"level": "DEBUG"}'
+
 
 ```
 
