@@ -20,8 +20,11 @@
     "sasl.mechanism": "AWS_MSK_IAM",
     "sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
     "sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+    "ssl.truststore.location": "/kafka/connect/debezium-plugins/truststore.jks",
+    "ssl.truststore.password": "MskConnector1@34",
+    "ssl.endpoint.identification.algorithm": "",
     "database.include.list": "demosrc",
-    "database.allowPublicKeyRetrieval": true,
+    "database.allowPublicKeyRetrieval": "true",
     "table.include.list": "demosrc.products",
     "include.schema.changes": "true",
     "schema.history.internal.kafka.bootstrap.servers": "b-2.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098,b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098",
@@ -43,8 +46,8 @@
     "skipped.operations": "none",
     "quote.identifiers": "always",
     "decimal.handling.mode": "double",
-    "auto.create"    : "false",
-    "auto.evolve"    : "false",
-    "delete.enabled" : "true"
+    "auto.create": "false",
+    "auto.evolve": "false",
+    "delete.enabled": "true"
   }
 }

@@ -41,6 +41,9 @@ services:
       - CONNECT_REST_ADVERTISED_HOST_NAME=connect
       - CONNECT_REST_PORT=8083
       # IAM 인증 설정
+      - AWS_PROFILE=${AWS_PROFILE:-stg-stg}
+      - AWS_SHARED_CREDENTIALS_FILE=/kafka/.aws/credentials
+      - AWS_REGION=ap-northeast-2
       - CONNECT_SECURITY_PROTOCOL=SASL_SSL
       - CONNECT_SASL_MECHANISM=AWS_MSK_IAM
       - CONNECT_SASL_JAAS_CONFIG=software.amazon.msk.auth.iam.IAMLoginModule required;
@@ -56,6 +59,7 @@ services:
         echo 'sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler' >> /kafka/bin/client.properties &&
         /docker-entrypoint.sh start"
     volumes:
+      - ~/.aws:/kafka/.aws:ro
       - ./connect/plugins:/kafka/connect/debezium-plugins:ro
     networks:
       - simplydemo

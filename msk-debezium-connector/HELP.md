@@ -4,7 +4,7 @@
 ```
 
 docker compose down connect
-docker compose up connect -d
+docker-compose -f docker-compose-local.yaml up -d
 
 
 docker exec -it mysql /bin/bash
@@ -76,12 +76,24 @@ curl -X DELETE http://localhost:8083/connectors/source-connector-demosrc
 ```
 export CLASSPATH=$(find /Users/seonbo.shim/opt/kafka_2.13-3.6.2/libsext -name "*.jar" | tr "\n" ":")$CLASSPATH
 export BOOTSTRAP_SERVERS="b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098,b-2.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098"
+export PATH="$PATH:/Users/seonbo.shim/opt/kafka_2.13-3.6.2/bin"
 
 # Topic 생성
-kafka-topics.sh --create --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SERVER --replication-factor 2 --partitions 1 --command-config client.properties
+kafka-topics.sh --create --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SERVERS --replication-factor 2 --partitions 1 --command-config client.properties
 
 # Topic 삭제
-kafka-topics.sh --delete --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties  
+kafka-topics.sh --delete --topic connect-configs  --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties  
+kafka-topics.sh --delete --topic connect-offsets  --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties  
+kafka-topics.sh --delete --topic connect-status  --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties  
+kafka-topics.sh --delete --topic history.schema-changes  --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties  
+kafka-topics.sh --delete --topic simply  --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties  
+
+
+
+
+
+
+
 
 # Topic 목록 조회 
 kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
@@ -95,26 +107,35 @@ kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVERS --command-config cl
 
 
 
-kafka-topics.sh --delete --topic simply --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
-kafka-topics.sh --delete --topic history.schema-changes --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
-kafka-topics.sh --delete --topic connect-status --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
-kafka-topics.sh --delete --topic connect-offsets --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
-kafka-topics.sh --delete --topic connect-configs --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-topics.sh --delete --topic simply --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
+kafka-topics.sh --delete --topic history.schema-changes --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
+kafka-topics.sh --delete --topic connect-status --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
+kafka-topics.sh --delete --topic connect-offsets --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
+kafka-topics.sh --delete --topic connect-configs --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
 ```
 
 
 ### Topic 데이터 확인
 
 ```
-kafka-console-consumer --topic __consumer_offsets --from-beginning --property print.key=true --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-console-consumer --topic __consumer_offsets --from-beginning --property print.key=true --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
 ```
 
 
+### ACL 정책 조정 
+
 ```
-kafka-acls.sh --list --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-acls.sh --list --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
 
 
-kafka-topics.sh --describe --topic history.database-changes --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-acls.sh --authorizer-propertieszookeeper.connect=b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:2182 \
+  --add --allow-principal User:ANONYMOUS --operation ALL --cluster \
+  --command-config client.properties
+
+--authorizer-propertieszookeeper.connect=example-ZookeeperConnectString --add --allow-principal User:ANONYMOUS --operation ALL --cluster
+
+
+kafka-topics.sh --describe --topic history.database-changes --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
 
 docker compose logs -f | grep -i -E 'failed|denied|creation'
 
@@ -123,14 +144,15 @@ docker compose logs -f | grep -i -E 'failed|denied|creation'
 ### 특정 Consumer 그룹 초기화
 ```
 
-kafka-consumer-groups.sh --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties \
+kafka-consumer-groups.sh --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties \
   --describe --group myConnector
 
-kafka-consumer-groups.sh --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties \
+kafka-consumer-groups.sh --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties \
   --group myConnector --reset-offsets --to-earliest --execute --all-topics
   
-kafka-topics.sh --bootstrap-server $BOOTSTRAP_SERVER --describe --topic __consumer_offsets
+kafka-topics.sh --bootstrap-server $BOOTSTRAP_SERVERS --describe --topic __consumer_offsets
 
-kafka-topics.sh --bootstrap-server $BOOTSTRAP_SERVER --describe --topic __consumer_offsets
-
+kafka-topics.sh --bootstrap-server $BOOTSTRAP_SERVERS --describe --topic __consumer_offsets
 ```
+
+- [Amazon MSK Cluster Connection Issue](https://repost.aws/knowledge-center/msk-cluster-connection-issues)

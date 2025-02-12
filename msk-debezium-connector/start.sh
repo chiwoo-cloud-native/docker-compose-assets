@@ -2,11 +2,11 @@
 
 # Step 1: Docker Compose 실행
 echo "Starting Docker Compose..."
-docker-compose up -d
+docker-compose -f docker-compose-local.yaml up -d
 
 # Step 2: 모든 서비스가 준비될 때까지 대기
 echo "Waiting for services to be healthy..."
-while ! docker inspect -f '{{.State.Health.Status}}' debezium-connect | grep -q "healthy"; do
+while ! docker inspect -f '{{.State.Health.Status}}' connect | grep -q "healthy"; do
   sleep 5
 done
 
