@@ -31,7 +31,7 @@ services:
       # Kafka Connect 기본 설정
       - CONNECT_PLUGIN_PATH=/kafka/connect
       - BOOTSTRAP_SERVERS=b-2.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098,b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098
-      - GROUP_ID=myConnector
+      - GROUP_ID=MyConnector
       - CONFIG_STORAGE_TOPIC=connect-configs
       - OFFSET_STORAGE_TOPIC=connect-offsets
       - STATUS_STORAGE_TOPIC=connect-status
@@ -50,11 +50,10 @@ services:
       - CONNECT_SASL_CLIENT_CALLBACK_HANDLER_CLASS=software.amazon.msk.auth.iam.IAMClientCallbackHandler
       # 플러그인 경로
       - CONNECT_PLUGIN_PATH=/kafka/connect/debezium-plugins
-      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/*:/kafka/connect/aws-msk-iam-auth/aws-msk-iam-auth-2.2.0.jar
+      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/*
     volumes:
       - ~/.aws:/kafka/.aws:ro
       - ./connect/plugins:/kafka/connect/debezium-plugins:ro
-      - ./connect/iam:/kafka/connect/aws-msk-iam-auth:ro
     networks:
       - simplydemo
     depends_on:

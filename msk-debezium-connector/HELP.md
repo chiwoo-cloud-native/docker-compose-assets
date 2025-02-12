@@ -22,9 +22,7 @@ kafka-topics.sh --create --bootstrap-server BOOTSTRAP_SERVER_STRING --replicatio
 
 
 
-curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @source-connector-demosrc.json
 
-curl -X DELETE http://localhost:8083/connectors/source-connector-demosrc
 
 ```
 
@@ -48,6 +46,22 @@ docker-compose down
 ```
 docker compose down connect
 docker compose up connect -d
+```
+
+
+### 커넥터 추가
+```
+# 추가 
+curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @source-connector-demosrc.json
+
+# 로그레밸 조정 
+curl -X PUT http://localhost:8083/connectors/loggers/org.apache.kafka.connect -H "Content-Type:application/json" -d '{"level": "DEBUG"}'
+
+# 제거
+curl -X DELETE http://localhost:8083/connectors/source-connector-demosrc
+
+
+
 ```
 
 ## kafka CLI
@@ -75,8 +89,20 @@ kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVER --command-config cli
 ### Topic 데이터 확인
 
 ```
-kafka-console-consumer --topic debezium.simplydemo.users --bootstrap-server broker:9092 --from-beginning --property print.key=true
+kafka-console-consumer --topic __consumer_offsets --from-beginning --property print.key=true --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
 ```
 
- 
+### 특정 Consumer 그룹 초기화
+```
 
+kafka-consumer-groups.sh --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties \
+  --describe --group myConnector
+
+kafka-consumer-groups.sh --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties \
+  --group myConnector --reset-offsets --to-earliest --execute --all-topics
+  
+kafka-topics.sh --bootstrap-server $BOOTSTRAP_SERVER --describe --topic __consumer_offsets
+
+kafka-topics.sh --bootstrap-server $BOOTSTRAP_SERVER --describe --topic __consumer_offsets
+
+```
