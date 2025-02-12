@@ -3,10 +3,14 @@
 CREATE DATABASE IF NOT EXISTS demosrc;
 use demosrc;
 
-CREATE USER 'kafkasrc'@'%' IDENTIFIED WITH mysql_native_password BY 'kafkasrc1234%';
-GRANT ALL PRIVILEGES ON demosrc.* TO 'kafkasrc'@'%';
-GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'kafkasrc'@'%';
-
+CREATE USER 'kfc'@'%' IDENTIFIED WITH mysql_native_password BY 'kfc1234';
+GRANT ALL PRIVILEGES ON demosrc.* TO 'kfc'@'%';
+GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'kfc'@'%';
+GRANT LOCK TABLES ON demosrc.* TO 'kfc'@'%';
+GRANT RELOAD ON *.* TO 'kfc'@'%';
+GRANT REPLICATION CLIENT ON *.* TO 'kfc'@'%';
+GRANT REPLICATION SLAVE ON *.* TO 'kfc'@'%';
+GRANT SELECT ON performance_schema.* TO 'kfc'@'%';
 FLUSH PRIVILEGES;
 
 CREATE TABLE IF NOT EXISTS demosrc.products
@@ -42,9 +46,9 @@ VALUES
 CREATE DATABASE IF NOT EXISTS demosink;
 use demosink;
 
-CREATE USER 'kafkasink'@'%' IDENTIFIED WITH mysql_native_password BY 'kafkasink1234';
-GRANT ALL PRIVILEGES ON demosink.* TO 'kafkasink'@'%';
-GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'kafkasink'@'%';
+CREATE USER 'sinko'@'%' IDENTIFIED WITH mysql_native_password BY 'sinko1234';
+GRANT ALL PRIVILEGES ON demosink.* TO 'sinko'@'%';
+GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'sinko'@'%';
 
 FLUSH PRIVILEGES;
 

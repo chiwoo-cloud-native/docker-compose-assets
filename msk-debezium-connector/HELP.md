@@ -1,4 +1,4 @@
-# debezium-2-msk
+# msk-debezium-connector
 
 
 ```
@@ -35,7 +35,7 @@ docker-compose up -d
 
 # MySQL
 docker exec -it mysqlsvc /bin/bash
-mysql -u kafkasrc -pkafkasrc1234% -D demosrc
+mysql -u kfc -pkfc1234 -D demosrc
  
 
 # stop
@@ -86,6 +86,20 @@ kafka-topics.sh --delete --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SE
 # Topic 목록 조회 
 kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
 kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
+
+
+
+
+
+
+
+
+
+kafka-topics.sh --delete --topic simply --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-topics.sh --delete --topic history.schema-changes --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-topics.sh --delete --topic connect-status --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-topics.sh --delete --topic connect-offsets --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-topics.sh --delete --topic connect-configs --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
 ```
 
 
