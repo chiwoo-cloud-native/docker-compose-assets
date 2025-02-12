@@ -21,6 +21,7 @@ kafka-topics.sh --create --bootstrap-server BOOTSTRAP_SERVER_STRING --replicatio
 
 
 
+select * from demosink.productinfo;
 
 
 
@@ -52,15 +53,16 @@ docker compose up connect -d
 ### 커넥터 추가
 ```
 # 추가 
-curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @source-connector-demosrc.json
+curl -X POST 'http://localhost:8083/connectors' -H 'Content-Type: application/json' -d @connect/source-connector-demosrc.json
 
 # 로그레밸 조정 
 curl -X PUT http://localhost:8083/connectors/loggers/org.apache.kafka.connect -H "Content-Type:application/json" -d '{"level": "DEBUG"}'
 
+# 상태 확인 
+curl http://localhost:8083/connectors/source-connector-demosrc/status
+
 # 제거
 curl -X DELETE http://localhost:8083/connectors/source-connector-demosrc
-
-
 
 ```
 
@@ -73,7 +75,7 @@ curl -X DELETE http://localhost:8083/connectors/source-connector-demosrc
 
 ```
 export CLASSPATH=$(find /Users/seonbo.shim/opt/kafka_2.13-3.6.2/libsext -name "*.jar" | tr "\n" ":")$CLASSPATH
-export BOOTSTRAP_SERVER="b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098,b-2.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098"
+export BOOTSTRAP_SERVERS="b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098,b-2.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098"
 
 # Topic 생성
 kafka-topics.sh --create --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SERVER --replication-factor 2 --partitions 1 --command-config client.properties
@@ -82,7 +84,8 @@ kafka-topics.sh --create --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SE
 kafka-topics.sh --delete --topic MyTestTopic111 --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties  
 
 # Topic 목록 조회 
-kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
+kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVERS --command-config client.properties
 ```
 
 
@@ -90,6 +93,17 @@ kafka-topics.sh --list --bootstrap-server $BOOTSTRAP_SERVER --command-config cli
 
 ```
 kafka-console-consumer --topic __consumer_offsets --from-beginning --property print.key=true --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+```
+
+
+```
+kafka-acls.sh --list --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+
+
+kafka-topics.sh --describe --topic history.database-changes --bootstrap-server $BOOTSTRAP_SERVER --command-config client.properties
+
+docker compose logs -f | grep -i -E 'failed|denied|creation'
+
 ```
 
 ### 특정 Consumer 그룹 초기화

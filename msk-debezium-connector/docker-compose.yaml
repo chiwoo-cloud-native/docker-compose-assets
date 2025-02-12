@@ -50,7 +50,14 @@ services:
       - CONNECT_SASL_CLIENT_CALLBACK_HANDLER_CLASS=software.amazon.msk.auth.iam.IAMClientCallbackHandler
       # 플러그인 경로
       - CONNECT_PLUGIN_PATH=/kafka/connect/debezium-plugins
-      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/*
+      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/debezium-connector-mysql/*:/kafka/connect/*
+    command: >
+      bash -c "
+        echo 'security.protocol=SASL_SSL' > /kafka/bin/client.properties &&
+        echo 'sasl.mechanism=AWS_MSK_IAM' >> /kafka/bin/client.properties &&
+        echo 'sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;' >> /kafka/bin/client.properties &&
+        echo 'sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler' >> /kafka/bin/client.properties &&
+        /docker-entrypoint.sh start"
     volumes:
       - ~/.aws:/kafka/.aws:ro
       - ./connect/plugins:/kafka/connect/debezium-plugins:ro

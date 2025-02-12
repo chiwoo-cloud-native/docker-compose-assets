@@ -1,0 +1,97 @@
+---
+services:
+
+  scylla1:
+    image: scylladb/scylla:6.2
+    container_name: scylla1
+    restart: always
+    command: >
+      --seeds=scylla1,scylla2
+      --smp 1
+      --memory 1400M
+      --overprovisioned 1
+      --api-address 0.0.0.0
+      --default-log-level warn
+    ports:
+      - "9042:9042"
+    healthcheck:
+      test: [ "CMD", "cqlsh", "-e describe keyspaces" ]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+    volumes:
+      - scylla-data1:/var/lib/scylla
+      - ./scylla/scylla.yaml:/etc/scylla/scylla.yaml
+      - ./scylla/cassandra-rackdc.properties.dc1:/etc/scylla/cassandra-rackdc.properties
+      - ./scylla/mutant-data.txt:/tmp/mutant-data.txt
+    cpuset: "0"
+    networks:
+      simplydemo:
+
+  scylla2:
+    image: scylladb/scylla:6.2
+    container_name: scylla2
+    restart: always
+    command: >
+      --seeds=scylla1,scylla2
+      --smp 1
+      --memory 1400M
+      --overprovisioned 1
+      --api-address 0.0.0.0
+      --default-log-level warn
+    ports:
+      - "29042:9042"
+    healthcheck:
+      test: [ "CMD", "cqlsh", "-e describe keyspaces" ]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+    volumes:
+      - scylla-data2:/var/lib/scylla
+      - ./scylla/scylla.yaml:/etc/scylla/scylla.yaml
+      - ./scylla/cassandra-rackdc.properties.dc1:/etc/scylla/cassandra-rackdc.properties
+    cpuset: "0"
+    networks:
+      simplydemo:
+
+  scylla3:
+    image: scylladb/scylla:6.2
+    container_name: scylla3
+    restart: always
+    command: >
+      --seeds=scylla1,scylla2
+      --smp 1
+      --memory 1400M
+      --overprovisioned 1
+      --api-address 0.0.0.0
+      --default-log-level warn
+    ports:
+      - "39042:9042"
+    volumes:
+      - scylla-data3:/var/lib/scylla
+      - ./scylla/scylla.yaml:/etc/scylla/scylla.yaml
+      - ./scylla/cassandra-rackdc.properties.dc1:/etc/scylla/cassandra-rackdc.properties
+    cpuset: "0"
+    networks:
+      simplydemo:
+
+#  scylla-loader:
+#    image: scylladb/scylla:6.2
+#    container_name: scylla-loader
+#    depends_on:
+#      scylla1:
+#        condition: service_healthy
+#    volumes:
+#      - ./conf/schema.cql:/tmp/schema.cql
+#    entrypoint: ''
+#    command: /bin/bash -c "echo loading scylladb keyspace && cqlsh scylla1 -f /tmp/schema.cql"
+
+volumes:
+  scylla-data1:
+  scylla-data2:
+  scylla-data3:
+
+networks:
+  simplydemo:
+    name: simplydemo
+    driver: bridge
