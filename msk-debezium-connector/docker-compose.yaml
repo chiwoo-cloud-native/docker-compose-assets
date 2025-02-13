@@ -22,14 +22,13 @@ services:
 #        ipv4_address: 172.19.10.10
 
   connect:
-    image: debezium/connect:3.0.7.Final
+    image: debezium/connect:3.0.0.Final
     container_name: connect
     ports:
       - 8083:8083
     healthcheck: { test: curl -f localhost:8083, interval: 20s, start_period: 100s }
     environment:
       # Kafka Connect 기본 설정
-      - CONNECT_PLUGIN_PATH=/kafka/connect
       - BOOTSTRAP_SERVERS=b-2.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098,b-1.symplydemomsk.175802.c3.kafka.ap-northeast-2.amazonaws.com:9098
       - GROUP_ID=MyConnector
       - CONFIG_STORAGE_TOPIC=connect-configs
@@ -47,7 +46,7 @@ services:
       - CONNECT_SASL_CLIENT_CALLBACK_HANDLER_CLASS=software.amazon.msk.auth.iam.IAMClientCallbackHandler
       # 플러그인 경로
       - CONNECT_PLUGIN_PATH=/kafka/connect/debezium-plugins
-      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/debezium-connector-mysql/*
+      - CLASSPATH=/kafka/connect/debezium-plugins/*:/kafka/connect/debezium-connector-mysql/*:/kafka/connect/debezium-connector-jdbc/*
       # TLS
       - CONNECT_SSL_TRUSTSTORE_LOCATION=/kafka/connect/debezium-plugins/truststore.jks
     command: >
